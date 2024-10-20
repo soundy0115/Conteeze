@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Music, Users, Share, Settings } from 'lucide-react';
+import { Music, Users, Share, Settings, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface User {
   name: string;
@@ -14,24 +15,42 @@ const features = [
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const userId = localStorage.getItem('userId');
     if (userId) {
       setUser({ name: userId });
+    } else {
+      // 사용자가 로그인하지 않은 경우 로그인 페이지로 리디렉션
+      navigate('/login');
     }
-  }, []);
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('userId');
+    localStorage.removeItem('authToken');
+    setUser(null);
+    navigate('/login');
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6 text-white">대시보드</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-white">대시보드</h1>
+        <button
+          onClick={handleLogout}
+          className="flex items-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+        >
+          <LogOut className="w-5 h-5 mr-2" />
+          로그아웃
+        </button>
+      </div>
       
-      {user && (
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-2xl font-semibold mb-2">로그인 성공!</h2>
-          <p className="text-lg">환영합니다, {user.name}님! 다시 뵙게 되어 기쁩니다.</p>
-        </div>
-      )}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 className="text-2xl font-semibold mb-2">로그인 성공!</h2>
+        <p className="text-lg">환영합니다, {user?.name}님! 다시 뵙게 되어 기쁩니다.</p>
+      </div>
 
       <h3 className="text-2xl font-semibold mb-4 text-white">주요 기능</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">

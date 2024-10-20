@@ -12,7 +12,11 @@ const Layout: React.FC<LayoutProps> = ({ children, showBackButton }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const shouldShowBackButton = showBackButton ?? location.pathname !== '/';
+  const isHeroPage = location.pathname === '/';
+  const isDashboardPage = location.pathname === '/dashboard';
+
+  const shouldShowBackButton = showBackButton ?? (!isHeroPage && !isDashboardPage);
+
 
   return (
     <div className="min-h-screen overflow-hidden relative flex items-center justify-center">
