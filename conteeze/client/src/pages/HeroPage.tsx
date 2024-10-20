@@ -2,9 +2,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
-export default function HeroPage() {
+const HeroPage: React.FC = () => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white p-4">
+    <div className="flex flex-col items-center justify-center text-white">
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -15,7 +15,7 @@ export default function HeroPage() {
           Welcome to Conteeze
         </h1>
         <p className="text-xl mb-8 text-gray-200">
-          Manage your CCM songlists with ease and grace
+          예배 인도자와 음악팀을 위한 완벽한 솔루션
         </p>
       </motion.div>
       
@@ -26,13 +26,13 @@ export default function HeroPage() {
         transition={{ duration: 0.8, delay: 0.2 }}
       >
         <Link to="/signup" className="px-6 py-3 bg-yellow-300 text-gray-900 rounded-full font-semibold hover:bg-yellow-200 transition duration-300 transform hover:scale-105 shadow-lg inline-block">
-          Sign Up
+          회원가입
         </Link>
         <Link to="/login" className="px-6 py-3 bg-white text-gray-900 rounded-full font-semibold hover:bg-gray-200 transition duration-300 transform hover:scale-105 shadow-lg inline-block">
-          Sign In
+          로그인
         </Link>
         <Link to="/learn-more" className="px-6 py-3 border-2 border-white text-white rounded-full font-semibold hover:bg-white hover:text-gray-900 transition duration-300 transform hover:scale-105 shadow-lg inline-block">
-          Learn More
+          더 알아보기
         </Link>
       </motion.div>
       
@@ -59,4 +59,6 @@ export default function HeroPage() {
       </motion.div>
     </div>
   );
-}
+};
+
+export default HeroPage;
