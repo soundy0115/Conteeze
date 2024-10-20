@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 
 export default function SignUpPage() {
-  const [email, setEmail] = useState('');
+  const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
@@ -33,17 +33,19 @@ export default function SignUpPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ userId, password }),
       });
 
       if (!response.ok) {
-        const { error } = await response.json();
-        throw new Error(error || '회원가입에 실패했습니다.');
+        const errorData = await response.json();
+        throw new Error(errorData.error || '회원가입에 실패했습니다.');
       }
 
+      const data = await response.json();
+      
       // 회원가입 성공
       alert('회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.');
-      navigate('/login');
+      navigate('/login', { state: { userId: data.user.userId } });
     } catch (err: any) {
       setError(err.message);
     }
@@ -63,18 +65,17 @@ export default function SignUpPage() {
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email address
+            <label htmlFor="userId" className="block text-sm font-medium text-gray-700">
+              User ID
             </label>
             <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
+              id="userId"
+              name="userId"
+              type="text"
               required
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={userId}
+              onChange={(e) => setUserId(e.target.value)}
             />
           </div>
           <div>

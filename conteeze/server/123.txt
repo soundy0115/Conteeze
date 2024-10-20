@@ -1,1 +1,0 @@
-mongodb+srv://soundy0115:Rkddkwl0115%21@conteezecluster0.pvmuk.mongodb.net/?retryWrites=true&w=majority&appName=ConteezeCluster0
