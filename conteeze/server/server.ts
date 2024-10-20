@@ -4,7 +4,14 @@ import cors from 'cors';
 import authRoutes from './routes/auth';
 import protectedRoutes from './routes/protectedRoutes'; // 추가
 import connectDB from './config/db';
+import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+dotenv.config();
 
+
+mongoose.connect(process.env.MONGO_URI!)
+  .then(() => console.log('MongoDB에 연결되었습니다.'))
+  .catch((error) => console.error('MongoDB 연결 오류:', error));
 const app = express();
 
 app.use(cors());

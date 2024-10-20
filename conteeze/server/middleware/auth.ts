@@ -4,7 +4,12 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
-export const authMiddleware: RequestHandler = (req, res, next) => {
+// Request 타입을 확장하여 userId 속성을 추가합니다.
+interface AuthenticatedRequest extends Request {
+  userId?: string;
+}
+
+export const authMiddleware: RequestHandler = (req: AuthenticatedRequest, res, next) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
 
   if (!token) {

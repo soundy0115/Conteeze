@@ -5,6 +5,7 @@ import HeroPage from './pages/HeroPage';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
 import LearnMorePage from './pages/LearnMorePage';
+import DashboardPage from './pages/DashboardPage';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/learn-more" element={<LearnMorePage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
         </Routes>
       </Layout>
     </Router>

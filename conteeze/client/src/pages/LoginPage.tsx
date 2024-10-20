@@ -1,7 +1,6 @@
-// src/pages/LoginPage.tsx
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 export default function LoginPage() {
   const [userId, setUserId] = useState('');
