@@ -31,7 +31,7 @@ export default function DashboardPage() {
     localStorage.removeItem('userId');
     localStorage.removeItem('authToken');
     setUser(null);
-    navigate('/login');
+    navigate('/');
   };
 
   return (
