@@ -1,13 +1,17 @@
+// App.tsx
 import React from 'react';
-import SonglistManager from './components/SonglistManager';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import HeroPage from './pages/HeroPage'; // 경로를 맞춰주세요
 
-function App() {
+const App: React.FC = () => {
   return (
-    <div className="App">
-      <h1>Conteeze</h1>
-      <SonglistManager />
-    </div>
+    <Router>
+      <Routes>
+        {/* "/" 경로에 HeroPage 컴포넌트를 렌더링 */}
+        <Route path="/" element={<HeroPage />} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
