@@ -1,17 +1,20 @@
-// App.tsx
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import HeroPage from './pages/HeroPage'; // 경로를 맞춰주세요
+import HeroPage from './pages/HeroPage';
+import LoginPage from './pages/LoginPage';
+import SignUpPage from './pages/SignUpPage';
 
-const App: React.FC = () => {
+function App() {
   return (
     <Router>
       <Routes>
-        {/* "/" 경로에 HeroPage 컴포넌트를 렌더링 */}
         <Route path="/" element={<HeroPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
+        {/* Add other routes as needed */}
       </Routes>
     </Router>
   );
-};
+}
 
 export default App;

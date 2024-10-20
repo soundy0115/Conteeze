@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 export default function HeroPage() {
   return (
@@ -24,12 +25,15 @@ export default function HeroPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.2 }}
       >
-        <button className="px-6 py-3 bg-yellow-300 text-gray-900 rounded-full font-semibold hover:bg-yellow-200 transition duration-300 transform hover:scale-105 shadow-lg">
+        <Link to="/signup" className="px-6 py-3 bg-yellow-300 text-gray-900 rounded-full font-semibold hover:bg-yellow-200 transition duration-300 transform hover:scale-105 shadow-lg inline-block">
           Sign Up
-        </button>
-        <button className="px-6 py-3 border-2 border-white text-white rounded-full font-semibold hover:bg-white hover:text-gray-900 transition duration-300 transform hover:scale-105 shadow-lg">
+        </Link>
+        <Link to="/login" className="px-6 py-3 bg-white text-gray-900 rounded-full font-semibold hover:bg-gray-200 transition duration-300 transform hover:scale-105 shadow-lg inline-block">
+          Sign In
+        </Link>
+        <Link to="/learn-more" className="px-6 py-3 border-2 border-white text-white rounded-full font-semibold hover:bg-white hover:text-gray-900 transition duration-300 transform hover:scale-105 shadow-lg inline-block">
           Learn More
-        </button>
+        </Link>
       </motion.div>
       
       <motion.div 
