@@ -13,7 +13,7 @@ songs = []
 
 def parse_song_info(song_element):
     song_info = {
-        'songID': '0',  # songID를 첫 번째 속성으로 이동
+        'songID': '0',
         'title': '제목 없음',
         'artist': '아티스트 없음',
         'album': '앨범 없음'
@@ -25,17 +25,17 @@ def parse_song_info(song_element):
         song_info['songID'] = input_element['value']
 
     # 제목 파싱
-    title_element = song_element.select_one('div.ellipsis.rank01 a')
+    title_element = song_element.select_one('div.wrap_song_info div.ellipsis.rank01 span a')
     if title_element:
         song_info['title'] = title_element.text.strip()
 
     # 아티스트 파싱
-    artist_element = song_element.select_one('div.ellipsis.rank02 a')
+    artist_element = song_element.select_one('div.wrap_song_info div.ellipsis.rank02 a')
     if artist_element:
         song_info['artist'] = artist_element.text.strip()
 
     # 앨범 파싱
-    album_element = song_element.select_one('div.ellipsis.rank03 a')
+    album_element = song_element.select_one('div.wrap_song_info div.ellipsis.rank03 a')
     if album_element:
         song_info['album'] = album_element.text.strip()
 
@@ -47,15 +47,15 @@ start_index = 51
 session = requests.Session()
 
 while start_index <= 19351:
-    # 멜론 페이지 URL
-    base_url = f"https://www.melon.com/genre/song_list.htm?gnrCode=GN2100&dtlGnrCode=GN2102#params%5BgnrCode%5D=GN2100&params%5BdtlGnrCode%5D=GN2102&params%5BorderBy%5D=NEW&params%5BsteadyYn%5D=N&po=pageObj&startIndex={start_index}"
+    # 멜론 페이지 URL 수정
+    base_url = f"https://www.melon.com/genre/song_listPaging.htm?startIndex={start_index}&pageSize=50&gnrCode=GN2100&dtlGnrCode=GN2102&orderBy=NEW&steadyYn=N"
 
     # 페이지 요청 및 HTML 파싱
     response = session.get(base_url, headers=headers)
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # 곡 리스트에서 각 곡의 정보를 추출합니다.
-    for row in soup.select('tr'):
+    for row in soup.select('tbody tr'):
         try:
             # 노래 정보를 딕셔너리로 저장
             song_info = parse_song_info(row)
@@ -69,7 +69,7 @@ while start_index <= 19351:
                 # 곡 상세 페이지에서 가사 가져오기
                 if song_id:
                     detail_url = f"https://www.melon.com/song/detail.htm?songId={song_id}"
-                    detail_response = requests.get(detail_url, headers=headers)
+                    detail_response = session.get(detail_url, headers=headers)
                     detail_soup = BeautifulSoup(detail_response.text, 'html.parser')
 
                     # 가사 정보 추출
