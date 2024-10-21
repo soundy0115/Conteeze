@@ -1,12 +1,15 @@
-import requests
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import json
 import time
+from selenium.common.exceptions import TimeoutException
+import requests
 
-# 헤더 설정
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36'
-}
+# Selenium 웹드라이버 설정 (Chrome 사용)
+driver = webdriver.Chrome()  # ChromeDriver 경로 설정이 필요할 수 있습니다
 
 # 노래 정보를 저장할 리스트
 songs = []
@@ -41,68 +44,98 @@ def parse_song_info(song_element):
 
     return song_info
 
-song_count = 0
-start_index = 51
-
-session = requests.Session()
-
-while start_index <= 19351:
-    # 멜론 페이지 URL 수정
-    base_url = f"https://www.melon.com/genre/song_listPaging.htm?startIndex={start_index}&pageSize=50&gnrCode=GN2100&dtlGnrCode=GN2102&orderBy=NEW&steadyYn=N"
-
-    # 페이지 요청 및 HTML 파싱
-    response = session.get(base_url, headers=headers)
+def get_lyrics(song_id):
+    url = f"https://www.melon.com/song/detail.htm?songId={song_id}"
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36'
+    }
+    
+    response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.text, 'html.parser')
 
-    # 곡 리스트에서 각 곡의 정보를 추출합니다.
-    for row in soup.select('tbody tr'):
-        try:
-            # 노래 정보를 딕셔너리로 저장
-            song_info = parse_song_info(row)
+    print("가사 찾는 중...")
 
-            # songID가 '0'이 아닌 경우에만 처리
-            if song_info['songID'] != '0':
-                # 곡 ID 추출
-                song_id_tag = row.select_one('a[href^="javascript:melon.link.goSongDetail"]')
-                song_id = song_id_tag['href'].split("'")[1] if song_id_tag else None
+    # 가사 div를 정확히 찾는 로직 수정
+    lyrics_div = soup.find('div', {'id': 'd_video_summary'})
+    
+    if lyrics_div:
+        # <br> 태그를 줄바꿈으로 처리
+        lyrics = lyrics_div.prettify()
+        lyrics = lyrics.replace('<br/>', '\n').replace('<br>', '\n')
+        lyrics = BeautifulSoup(lyrics, 'html.parser').get_text(strip=True)
+        print("가사 찾음: " + lyrics)
+        return lyrics
 
-                # 곡 상세 페이지에서 가사 가져오기
-                if song_id:
-                    detail_url = f"https://www.melon.com/song/detail.htm?songId={song_id}"
-                    detail_response = session.get(detail_url, headers=headers)
-                    detail_soup = BeautifulSoup(detail_response.text, 'html.parser')
+    return "가사를 찾을 수 없습니다."
 
-                    # 가사 정보 추출
-                    lyrics_div = detail_soup.select_one('div.lyric')
-                    if lyrics_div:
-                        # 가사 텍스트 추출 (줄바꿈 유지)
-                        lyrics_text = lyrics_div.get_text(separator='\n', strip=True)
-                    else:
-                        lyrics_text = "가사 없음"
-                else:
-                    lyrics_text = "가사 정보 없음"
 
-                # 노래 정보를 딕셔너리로 저장
-                songs.append({
-                    'songID': song_info['songID'],
-                    'title': song_info['title'],
-                    'artist': song_info['artist'],
-                    'album': song_info['album'],
-                    'lyrics': lyrics_text
-                })
-                song_count += 1
-                print(f"{song_count}번째 곡 추가: {song_info['title']} - {song_info['artist']}")
-                print(f"가사 첫 100자: {lyrics_text[:100]}")
+song_count = 0
+page_number = 1
 
-                # 요청 간격 지연
-                time.sleep(0.3)
+while page_number <= 2:  # 19351 / 50 = 약 388 페이지
+    # 멜론 장르별 차트 페이지 접속
+    url = f"https://www.melon.com/genre/song_list.htm?gnrCode=GN2100&dtlGnrCode=GN2102#params%5BgnrCode%5D=GN2100&params%5BdtlGnrCode%5D=GN2102&params%5BorderBy%5D=POP&params%5BsteadyYn%5D=N&po=pageObj&startIndex={1 + (page_number - 1) * 50}"
+    driver.get(url)
 
-        except Exception as e:
-            print(f"오류 발생: {e}")
+    # 페이지 로딩 대기 및 확인
+    try:
+        WebDriverWait(driver, 60).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "div.service_list_song.d_song_list"))
+        )
+        # 추가적인 대기 시간
+        time.sleep(5)
+    except TimeoutException:
+        print(f"페이지 {page_number}를 로드하는 데 실패했습니다. 다음 페이지로 넘어갑니다.")
+        page_number += 1
+        continue
 
-    print(f"페이지 {start_index}에서 {start_index+49}까지 처리 완료")
-    start_index += 50
-    time.sleep(1)  # 페이지 간 지연 시간 추가
+    # 현재 페이지의 HTML 파싱
+    soup = BeautifulSoup(driver.page_source, 'html.parser')
+
+    # 곡 리스트 확인
+    song_list_div = soup.select_one('div.service_list_song.d_song_list')
+    if not song_list_div:
+        print(f"페이지 {page_number}에서 곡 목록을 찾을 수 없습니다.")
+        page_number += 1
+        continue
+
+    # 각 곡에 대한 정보 추출
+    songs_on_page = song_list_div.select('tr:not(.lst50_th)')  # 헤더 행 제외
+    for song in songs_on_page:
+        title = song.select_one('div.ellipsis.rank01 a')
+        if title:
+            title = title.text.strip()
+        else:
+            continue
+
+        artist = song.select_one('div.ellipsis.rank02 a')
+        if artist:
+            artist = artist.text.strip()
+        else:
+            artist = "Unknown Artist"
+
+        album = song.select_one('div.ellipsis.rank03 a')
+        if album:
+            album = album.text.strip()
+        else:
+            album = "Unknown Album"
+
+        song_id = song.select_one('input[type="checkbox"]')['value']
+        lyrics = get_lyrics(song_id)
+        
+        song_data = {
+            "title": title,
+            "artist": artist,
+            "album": album,
+            "lyrics": lyrics
+        }
+        songs.append(song_data)
+        print(song_data['title'] + " " + song_data['artist'] + " 완료")
+    print(f"페이지 {page_number} 완료")
+    page_number += 1
+
+# 브라우저 종료
+driver.quit()
 
 # JSON 파일로 저장
 with open('melon_songs.json', 'w', encoding='utf-8') as f:
