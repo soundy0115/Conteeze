@@ -1,20 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { Music, Users, Share, Settings, LogOut } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Music, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import Sidebar from '../components/Sidebar';
 
 interface User {
   name: string;
 }
 
-const features = [
-  { icon: <Music className="w-6 h-6" />, name: "곡 목록 관리" },
-  { icon: <Users className="w-6 h-6" />, name: "팀 협업" },
-  { icon: <Share className="w-6 h-6" />, name: "공유 옵션" },
-  { icon: <Settings className="w-6 h-6" />, name: "계정 설정" },
+const popularSongs = [
+  "Amazing Grace", "How Great Thou Art", "10,000 Reasons", "주님의 은혜", "나의 안에 거하라",
+  "나 같은 죄인 살리신", "주님 뜻대로 살기로 했네", "나의 모습 나의 소유", "내 영혼이 은총 입어", "주님만이 나의 전부입니다"
 ];
+
+const songThemes = [
+  "감사", "은혜", "기도", "추수감사절", "동행", "헌신"
+];  
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
+  const [currentSongIndex, setCurrentSongIndex] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,54 +26,85 @@ export default function DashboardPage() {
     if (userId) {
       setUser({ name: userId });
     } else {
-      // 사용자가 로그인하지 않은 경우 로그인 페이지로 리디렉션
       navigate('/login');
     }
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('userId');
-    localStorage.removeItem('authToken');
-    setUser(null);
-    navigate('/');
+  const nextSongs = () => {
+    setCurrentSongIndex((prevIndex) => (prevIndex + 3) % popularSongs.length);
+  };
+
+  const prevSongs = () => {
+    setCurrentSongIndex((prevIndex) => (prevIndex - 3 + popularSongs.length) % popularSongs.length);
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-white">대시보드</h1>
-        <button
-          onClick={handleLogout}
-          className="flex items-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-        >
-          <LogOut className="w-5 h-5 mr-2" />
-          로그아웃
-        </button>
-      </div>
-      
-      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-        <h2 className="text-2xl font-semibold mb-2">로그인 성공!</h2>
-        <p className="text-lg">환영합니다, {user?.name}님! 다시 뵙게 되어 기쁩니다.</p>
-      </div>
-
-      <h3 className="text-2xl font-semibold mb-4 text-white">주요 기능</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        {features.map((feature, index) => (
-          <div key={index} className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center mb-2">
-              {feature.icon}
-              <h4 className="text-xl font-semibold ml-2">{feature.name}</h4>
-            </div>
-            <p>이 기능은 현재 개발 중입니다. 업데이트를 기대해 주세요!</p>
+    <div className="flex h-screen bg-gray-100">
+      <Sidebar />
+      {/* 메인 콘텐츠 */}
+      <div className="flex-1 overflow-y-auto p-8">
+        <h2 className="text-3xl font-bold text-gray-800 mb-6">대시보드</h2>
+        
+        {/* 검색바 */}
+        <div className="mb-8">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="곡 검색..."
+              className="w-full p-4 pl-12 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+            />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <button className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors">
+              검색
+            </button>
           </div>
-        ))}
-      </div>
+        </div>
 
-      <div className="text-center">
-        <p className="text-lg text-white">
-          최고의 경험을 제공하기 위해 열심히 노력하고 있습니다. 
-          곧 새로운 기능과 업데이트를 확인하실 수 있습니다!
-        </p>
+        {/* 가장 많이 사용된 찬양 리스트 */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <h3 className="text-2xl font-semibold mb-4">가장 많이 사용된 찬양</h3>
+          <div className="flex items-center">
+            <button onClick={prevSongs} className="p-2 rounded-full hover:bg-gray-200 transition-colors">
+              <ChevronLeft className="w-6 h-6 text-gray-600" />
+            </button>
+            <div className="flex-1 overflow-hidden">
+              <div 
+                className="flex transition-transform duration-300 ease-in-out" 
+                style={{ transform: `translateX(-${currentSongIndex * 33.33}%)` }}
+              >
+                {popularSongs.map((song, index) => (
+                  <div key={index} className="flex-shrink-0 w-1/3 px-2">
+                    <div className="flex flex-col items-center">
+                      <div className="w-20 h-20 bg-gray-200 rounded-full mb-2 flex items-center justify-center">
+                        <Music className="w-10 h-10 text-gray-500" />
+                      </div>
+                      <p className="text-sm text-gray-700 text-center">{song}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <button onClick={nextSongs} className="p-2 rounded-full hover:bg-gray-200 transition-colors">
+              <ChevronRight className="w-6 h-6 text-gray-600" />
+            </button>
+          </div>
+        </div>
+
+        {/* 주제별 찬양 섹션 */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h3 className="text-2xl font-semibold mb-4">주제별 찬양</h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {songThemes.map((theme, index) => (
+              <Link
+                key={index}
+                to={`/songs-by-theme/${theme}`}
+                className="bg-blue-100 text-blue-800 rounded-lg p-4 text-center hover:bg-blue-200 transition-colors"
+              >
+                {theme}
+              </Link>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

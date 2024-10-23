@@ -6,19 +6,28 @@ import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
 import LearnMorePage from './pages/LearnMorePage';
 import DashboardPage from './pages/DashboardPage';
+import MySetlistsPage from './pages/MySetlistsPage';
 
 function App() {
   return (
     <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<HeroPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignUpPage />} />
-          <Route path="/learn-more" element={<LearnMorePage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-        </Routes>
-      </Layout>
+      <Routes>
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/my-setlists" element={<MySetlistsPage />} />
+        <Route
+          path="*"
+          element={
+            <Layout>
+              <Routes>
+                <Route path="/" element={<HeroPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignUpPage />} />
+                <Route path="/learn-more" element={<LearnMorePage />} />
+              </Routes>
+            </Layout>
+          }
+        />
+      </Routes>
     </Router>
   );
 }

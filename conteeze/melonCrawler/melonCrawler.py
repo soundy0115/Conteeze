@@ -64,7 +64,7 @@ def get_lyrics(song_id):
         lyrics = lyrics_div.prettify()
         lyrics = lyrics.replace('<br/>', '\n').replace('<br>', '\n')
         lyrics = BeautifulSoup(lyrics, 'html.parser').get_text(strip=True)
-        print("가사 찾음: " + lyrics)
+        print("가사 찾음")
         return lyrics
 
     return "가사를 찾을 수 없습니다."
@@ -80,10 +80,10 @@ if os.path.exists(output_file):
     page_number = len(songs) // 50 + 1
 else:
     songs = []
-    page_number = 35
+    page_number = 311
 
 try:
-    while page_number <= 50:  # 19351 / 50 = 약 388 페이지
+    while page_number <= 350:  # 19351 / 50 = 약 388 페이지
         # 멜론 장르별 차트 페이지 접속
         url = f"https://www.melon.com/genre/song_list.htm?gnrCode=GN2100&dtlGnrCode=GN2102#params%5BgnrCode%5D=GN2100&params%5BdtlGnrCode%5D=GN2102&params%5BorderBy%5D=NEW&params%5BsteadyYn%5D=N&po=pageObj&startIndex={1 + (page_number - 1) * 50}"
         driver.get(url)
