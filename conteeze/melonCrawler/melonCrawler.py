@@ -80,12 +80,12 @@ if os.path.exists(output_file):
     page_number = len(songs) // 50 + 1
 else:
     songs = []
-    page_number = 311
+    page_number = 1
 
 try:
-    while page_number <= 350:  # 19351 / 50 = 약 388 페이지
+    while page_number <= 51:  # 19351 / 50 = 약 388 페이지
         # 멜론 장르별 차트 페이지 접속
-        url = f"https://www.melon.com/genre/song_list.htm?gnrCode=GN2100&dtlGnrCode=GN2102#params%5BgnrCode%5D=GN2100&params%5BdtlGnrCode%5D=GN2102&params%5BorderBy%5D=NEW&params%5BsteadyYn%5D=N&po=pageObj&startIndex={1 + (page_number - 1) * 50}"
+        url = f"https://www.melon.com/genre/song_list.htm?gnrCode=GN2100&dtlGnrCode=GN2104#params%5BgnrCode%5D=GN2100&params%5BdtlGnrCode%5D=GN2104&params%5BorderBy%5D=NEW&params%5BsteadyYn%5D=N&po=pageObj&startIndex={1 + (page_number - 1) * 50}"
         driver.get(url)
 
         # 페이지 로딩 대기 및 확인
