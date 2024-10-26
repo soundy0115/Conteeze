@@ -7,13 +7,14 @@ import SignUpPage from './pages/SignUpPage';
 import LearnMorePage from './pages/LearnMorePage';
 import DashboardPage from './pages/DashboardPage';
 import MySetlistsPage from './pages/MySetlistsPage';
-
+import SettingsPage from './pages/SettingsPage';
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/my-setlists" element={<MySetlistsPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
         <Route
           path="*"
           element={

@@ -41,7 +41,7 @@ const Sidebar: React.FC = () => {
       </nav>
       <button
         onClick={handleLogout}
-        className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-200 mt-auto mb-4"
+        className="flex items-center px-4 py-2 text-red-600 hover:bg-red-100 mt-auto mb-4"
       >
         <LogOut className="w-5 h-5 mr-2" />
         로그아웃

@@ -15,36 +15,6 @@ driver = webdriver.Chrome()  # ChromeDriver 경로 설정이 필요할 수 있�
 # 노래 정보를 저장할 리스트
 songs = []
 
-def parse_song_info(song_element):
-    song_info = {
-        'songID': '0',
-        'title': '제목 없음',
-        'artist': '아티스트 없음',
-        'album': '앨범 없음'
-    }
-
-    # songID 파싱
-    input_element = song_element.select_one('input[type="checkbox"]')
-    if input_element and 'value' in input_element.attrs:
-        song_info['songID'] = input_element['value']
-
-    # 제목 파싱
-    title_element = song_element.select_one('div.wrap_song_info div.ellipsis.rank01 span a')
-    if title_element:
-        song_info['title'] = title_element.text.strip()
-
-    # 아티스트 파싱
-    artist_element = song_element.select_one('div.wrap_song_info div.ellipsis.rank02 a')
-    if artist_element:
-        song_info['artist'] = artist_element.text.strip()
-
-    # 앨범 파싱
-    album_element = song_element.select_one('div.wrap_song_info div.ellipsis.rank03 a')
-    if album_element:
-        song_info['album'] = album_element.text.strip()
-
-    return song_info
-
 def get_lyrics(song_id):
     url = f"https://m2.melon.com/song/lyrics.htm?songId={song_id}"
     headers = {
@@ -71,7 +41,7 @@ def get_lyrics(song_id):
 
 
 # 파일 이름 설정
-output_file = 'melon_songs_new.json'
+output_file = 'melon_songs_worship.json'
 
 # 이전에 저장된 데이터 불러오기
 if os.path.exists(output_file):
@@ -83,7 +53,10 @@ else:
     page_number = 1
 
 try:
-    while page_number <= 51:  # 19351 / 50 = 약 388 페이지
+    total_songs = 2548  # 총 곡 수
+    processed_songs = len(songs)  # 이미 처리된 곡 수
+
+    while page_number <= 51:
         # 멜론 장르별 차트 페이지 접속
         url = f"https://www.melon.com/genre/song_list.htm?gnrCode=GN2100&dtlGnrCode=GN2104#params%5BgnrCode%5D=GN2100&params%5BdtlGnrCode%5D=GN2104&params%5BorderBy%5D=NEW&params%5BsteadyYn%5D=N&po=pageObj&startIndex={1 + (page_number - 1) * 50}"
         driver.get(url)
@@ -131,17 +104,42 @@ try:
             else:
                 album = "Unknown Album"
 
+            # 앨범 이미지 URL 추출
+            album_img = song.select_one('img[onerror="WEBPOCIMG.defaultAlbumImg(this);"]')
+            if album_img and 'src' in album_img.attrs:
+                album_img = album_img['src']
+            else:
+                album_img = "Unknown Album Image"
+
+            # 좋아요 수 추출
+            like_element = song.select_one('button.like span.cnt')
+            if like_element:
+                like_count = like_element.text.strip()
+                like_count = ''.join(filter(str.isdigit, like_count))  # 숫자만 추출
+                try:
+                    like_count = int(like_count)
+                except ValueError:
+                    like_count = 0
+            else:
+                like_count = 0
+
             song_id = song.select_one('input[type="checkbox"]')['value']
             lyrics = get_lyrics(song_id)
             
             song_data = {
+                "songId": song_id,
                 "title": title,
                 "artist": artist,
                 "album": album,
-                "lyrics": lyrics
+                "album_img": album_img,
+                "lyrics": lyrics,
+                "like": like_count  # 좋아요 수
             }
             songs.append(song_data)
-            print(song_data['title'] + " " + song_data['artist'] + " 완료")
+            processed_songs += 1
+            progress = (processed_songs / total_songs) * 100
+            print(f"{song_data['title']} - {song_data['artist']} 완료 ({processed_songs}/{total_songs}, {progress:.2f}%)")
+
         print(f"페이지 {page_number} 완료 및 저장됨")
         page_number += 1
 
