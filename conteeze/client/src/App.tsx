@@ -8,6 +8,8 @@ import LearnMorePage from './pages/LearnMorePage';
 import DashboardPage from './pages/DashboardPage';
 import MySetlistsPage from './pages/MySetlistsPage';
 import SettingsPage from './pages/SettingsPage';
+import SearchPage from './pages/SearchPage';
+
 function App() {
   return (
     <Router>
@@ -15,6 +17,7 @@ function App() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/my-setlists" element={<MySetlistsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/search" element={<SearchPage />} />
         <Route
           path="*"
           element={

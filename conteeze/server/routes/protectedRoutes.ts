@@ -1,6 +1,7 @@
 // routes/protectedRoutes.ts
 import express, { Request, Response, NextFunction, RequestHandler } from 'express';
 import { authMiddleware } from '../middleware/auth';
+import { Song } from '../models/Song';
 
 const router = express.Router();
 
@@ -10,5 +11,23 @@ const protectedHandler: RequestHandler = (req, res, next) => {
 };
 
 router.get('/protected', authMiddleware, protectedHandler);
+
+router.get('/songs/search', async (req, res) => {
+  try {
+    const { term } = req.query;
+    const regex = new RegExp(term as string, 'i');
+    const songs = await Song.find({
+      $or: [
+        { title: regex },
+        { artist: regex },
+        { album: regex }
+      ]
+    }).limit(20);
+    res.json(songs);
+  } catch (error) {
+    console.error('검색 중 오류 발생:', error);
+    res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+  }
+});
 
 export default router;
