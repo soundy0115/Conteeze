@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction, RequestHandler } from 'express';
-import { Song } from '../models/Song';
+import { ISong } from '../models/Song';
 
 const router = express.Router();
 
@@ -26,7 +26,7 @@ const searchHandler: RequestHandler = async (req, res, next): Promise<void> => {
 
     console.log('MongoDB 쿼리:', query);  // 쿼리 로깅 추가
 
-    const songs = await Song.find(query).limit(100);  // 결과 제한 추가
+    const songs = await ISong.find(query).limit(100);  // 결과 제한 추가
     
     // 검색 결과 필터링 추가
     const filteredSongs = songs.filter(song => 

@@ -1,7 +1,8 @@
 // routes/protectedRoutes.ts
 import express, { Request, Response, NextFunction, RequestHandler } from 'express';
 import { authMiddleware } from '../middleware/auth';
-import { Song } from '../models/Song';
+import { ISong } from '../models/Song';
+import SongModel from '../models/Song';
 
 const router = express.Router();
 
@@ -16,7 +17,7 @@ router.get('/songs/search', async (req, res) => {
   try {
     const { term } = req.query;
     const regex = new RegExp(term as string, 'i');
-    const songs = await Song.find({
+    const songs = await SongModel.find({
       $or: [
         { title: regex },
         { artist: regex },
