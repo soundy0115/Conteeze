@@ -1,13 +1,23 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 
-const songSchema = new mongoose.Schema({
-  songId: String,
-  title: String,
-  artist: String,
-  album: String,
-  album_img: String,
-  lyrics: String,
-  like: Number,
+export interface ISong extends Document {
+  songId: string;
+  title: string;
+  artist: string;
+  album: string;
+  album_img: string;
+  lyrics: string;
+  like: number;
+}
+
+const songSchema: Schema = new Schema({
+  songId: { type: String, required: true },
+  title: { type: String, required: true },
+  artist: { type: String, required: true },
+  album: { type: String, required: true },
+  album_img: { type: String, required: true },
+  lyrics: { type: String, required: true },
+  like: { type: Number, default: 0 },
 });
 
-export const Song = mongoose.model('Song', songSchema);
+export default mongoose.model<ISong>('Song', songSchema);

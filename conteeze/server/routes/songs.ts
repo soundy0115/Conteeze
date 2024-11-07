@@ -34,7 +34,7 @@ const searchHandler: RequestHandler = async (req, res, next): Promise<void> => {
       song?.lyrics?.toLowerCase().includes(q.toLowerCase())
     );
 
-    console.log(`검색 결과: ${filteredSongs.length}개의 노래 찾음`);
+    console.log(`Server 검색 결과: ${filteredSongs.length}개의 노래 찾음`);
 
     res.json(filteredSongs);
   } catch (error) {

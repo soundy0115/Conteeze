@@ -1,29 +1,27 @@
-// config/db.ts
 import mongoose from 'mongoose';
 
 const connectDB = async () => {
   try {
-    const uri = process.env.MONGO_URI?.replace('<DB_PASSWORD>', process.env.DB_PASSWORD || '');
-    if (!uri) {
-      throw new Error('MONGO_URI 환경 변수가 설정되지 않았습니다.');
-    }
-    console.log(`Connecting to MongoDB with URI: ${uri}`); // 디버깅을 위해 추가
-    const conn = await mongoose.connect(uri);
-    console.log(`MongoDB 연결 성공: ${conn.connection.host}`);
+    await mongoose.connect(process.env.MONGODB_URI as string, {
+      // 연결 옵션 추가
+      serverSelectionTimeoutMS: 5000, // 서버 선택 타임아웃
+      socketTimeoutMS: 45000, // 소켓 타임아웃
+      connectTimeoutMS: 10000, // 연결 타임아웃
+    });
+    console.log(`MongoDB 연결 성공: ${mongoose.connection.host}`);
   } catch (error) {
-    if (error instanceof Error) {
-      console.error(`MongoDB 연결 오류: ${error.message}`);
-      if ('code' in error) {
-        console.error('MongoDB 서버 오류 코드:', (error as any).code);
-      }
-    } else {
-      console.error('알 수 없는 오류가 발생했습니다');
-    }
-    // 테스트 환경이 아닐 때만 프로세스를 종료합니다.
-    if (process.env.NODE_ENV !== 'test') {
-      process.exit(1);
-    }
+    console.error('MongoDB 연결 오류:', error);
+    process.exit(1);
   }
 };
+
+// 연결 이벤트 리스너 추가
+mongoose.connection.on('error', err => {
+  console.error('MongoDB 연결 에러:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('MongoDB 연결이 끊어졌습니다. 재연결을 시도합니다.');
+});
 
 export default connectDB;

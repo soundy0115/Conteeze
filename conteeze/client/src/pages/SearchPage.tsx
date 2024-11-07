@@ -8,10 +8,15 @@ export default function SearchPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<Song[]>([]);
   const [searchType, setSearchType] = useState('title');
+  const [isSearching, setIsSearching] = useState(false);
 
   const handleSearch = async () => {
+    if (isSearching) return;
+    setIsSearching(true);
+
     if (!searchTerm.trim()) {
       console.log('검색어를 입력해주세요.');
+      setIsSearching(false);
       return;
     }
 
@@ -22,6 +27,14 @@ export default function SearchPage() {
       setSearchResults(songs);
     } catch (error) {
       console.error('검색 오류:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch(); // 엔터 키가 눌리면 검색 실행
     }
   };
 
@@ -55,6 +68,7 @@ export default function SearchPage() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={handleKeyDown}
               placeholder={searchType === 'title' ? "곡 제목으로 검색..." : "가사로 검색..."}
               className="w-full p-4 pl-12 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
             />
