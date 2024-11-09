@@ -7,9 +7,7 @@ const api = axios.create({
 
 export const searchSongs = async (query: string, type: 'title' | 'lyrics'): Promise<SongType[]> => {
   try {
-    const encodedQuery = encodeURIComponent(query);
-    console.log(`API 호출: /songs/search?q=${encodedQuery}&type=${type}`);
-    const response = await api.get('/songs/search', { params: { q: encodedQuery, type } });
+    const response = await api.get('/songs/search', { params: { q: query, type } });
     console.log('API 응답:', response.data);
     return response.data;
   } catch (error) {

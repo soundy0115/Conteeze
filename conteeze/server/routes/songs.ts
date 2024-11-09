@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction, RequestHandler } from 'express';
-import { ISong } from '../models/Song';
+import ISong from '../models/Song';
 
 const router = express.Router();
 
@@ -35,7 +35,7 @@ const searchHandler: RequestHandler = async (req, res, next): Promise<void> => {
     );
 
     console.log(`Server 검색 결과: ${filteredSongs.length}개의 노래 찾음`);
-
+    
     res.json(filteredSongs);
   } catch (error) {
     console.error('검색 오류:', error);

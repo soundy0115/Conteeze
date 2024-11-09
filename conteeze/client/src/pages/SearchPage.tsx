@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Heart } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import { searchSongs } from '../services/api';
 import { Song } from '../types';
 
 export default function SearchPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<Song[]>([]);
+  const [searchResults, setSearchResults] = useState<Song[]>([{ 
+    songId: "-", 
+    title: '-', 
+    artist: '-', 
+    album: '-', 
+    like: 0, 
+    album_img: '-', 
+    lyrics: '-'
+  }]);
   const [searchType, setSearchType] = useState('title');
   const [isSearching, setIsSearching] = useState(false);
 
@@ -85,28 +93,22 @@ export default function SearchPage() {
         <div className="bg-white rounded-lg shadow-md p-6">
           <h3 className="text-2xl font-semibold mb-4">검색 결과</h3>
           {searchResults.length > 0 ? (
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="p-2 text-left">앨범</th>
-                  <th className="p-2 text-left">제목</th>
-                  <th className="p-2 text-left">아티스트</th>
-                  <th className="p-2 text-left">좋아요</th>
-                </tr>
-              </thead>
-              <tbody>
-                {searchResults.map((song) => (
-                  <tr key={song.songId} className="border-b">
-                    <td className="p-2">
-                      <img src={song.album_img} alt={song.album} className="w-12 h-12 object-cover" />
-                    </td>
-                    <td className="p-2">{song.title}</td>
-                    <td className="p-2">{song.artist}</td>
-                    <td className="p-2">{song.like}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="space-y-4">
+              {searchResults.map((song) => (
+                <div key={song.songId} className="p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow flex items-center">
+                  <img src={song.album_img} alt={song.album} className="w-16 h-16 rounded-md mr-4" />
+                  <div className="flex-1">
+                    <div className="text-lg font-bold">{song.title}</div>
+                    <div className="text-sm text-gray-600 mt-1">{song.artist}</div>
+                    <div className="text-sm text-gray-500 mt-1">{song.album}</div>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <Heart className="text-red-500 w-8 h-8 mb-1" />
+                    <div className="text-lg font-semibold text-gray-700">{song.like}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : (
             <p className="text-gray-500">검색 결과가 없습니다.</p>
           )}
