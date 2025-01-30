@@ -3,20 +3,17 @@ import { Search, Heart } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import { searchSongs } from '../services/api';
 import { Song } from '../types';
+import { useNavigate } from 'react-router-dom';
 
 export default function SearchPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<Song[]>([{ 
-    songId: "-", 
-    title: '-', 
-    artist: '-', 
-    album: '-', 
-    like: 0, 
-    album_img: '-', 
-    lyrics: '-'
-  }]);
+  const [searchResults, setSearchResults] = useState<Song[]>([]);
   const [searchType, setSearchType] = useState('title');
   const [isSearching, setIsSearching] = useState(false);
+  const [sortType, setSortType] = useState<'title' | 'artist' | 'like' | 'album'>('title');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleSearch = async () => {
     if (isSearching) return;
@@ -44,6 +41,22 @@ export default function SearchPage() {
     if (e.key === 'Enter') {
       handleSearch(); // 엔터 키가 눌리면 검색 실행
     }
+  };
+
+  const handleSort = (type: 'title' | 'artist' | 'like' | 'album', order: 'asc' | 'desc') => {
+    setSortType(type);
+    setSortOrder(order);
+    setIsSortMenuOpen(false); // Close the sort menu after selecting a sort type
+    const sortedResults = [...searchResults].sort((a, b) => {
+      if (a[type] < b[type]) return order === 'asc' ? -1 : 1;
+      if (a[type] > b[type]) return order === 'asc' ? 1 : -1;
+      return 0;
+    });
+    setSearchResults(sortedResults);
+  };
+
+  const handleSongClick = (songId: string) => {
+    navigate(`/songs/${songId}`);
   };
 
   return (
@@ -91,12 +104,78 @@ export default function SearchPage() {
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-2xl font-semibold mb-4">검색 결과</h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-2xl font-semibold">검색 결과</h3>
+            <div className="relative">
+              <button
+                onClick={() => setIsSortMenuOpen(!isSortMenuOpen)}
+                className="px-3 py-1 rounded-md border border-black bg-white text-black"
+              >
+                {`${sortType === 'title' ? '제목' : sortType === 'artist' ? '아티스트' : sortType === 'like' ? '좋아요' : '앨범'} ${sortOrder === 'asc' ? '오름차순' : '내림차순'}`}
+              </button>
+              {isSortMenuOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-md shadow-lg">
+                  <button
+                    onClick={() => handleSort('title', 'asc')}
+                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                  >
+                    제목 오름차순
+                  </button>
+                  <button
+                    onClick={() => handleSort('title', 'desc')}
+                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                  >
+                    제목 내림차순
+                  </button>
+                  <button
+                    onClick={() => handleSort('artist', 'asc')}
+                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                  >
+                    아티스트 오름차순
+                  </button>
+                  <button
+                    onClick={() => handleSort('artist', 'desc')}
+                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                  >
+                    아티스트 내림차순
+                  </button>
+                  <button
+                    onClick={() => handleSort('like', 'asc')}
+                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                  >
+                    좋아요 오름차순
+                  </button>
+                  <button
+                    onClick={() => handleSort('like', 'desc')}
+                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                  >
+                    좋아요 내림차순
+                  </button>
+                  <button
+                    onClick={() => handleSort('album', 'asc')}
+                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                  >
+                    앨범 오름차순
+                  </button>
+                  <button
+                    onClick={() => handleSort('album', 'desc')}
+                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                  >
+                    앨범 내림차순
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
           {searchResults.length > 0 ? (
             <div className="space-y-4">
               {searchResults.map((song) => (
-                <div key={song.songId} className="p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow flex items-center">
-                  <img src={song.album_img} alt={song.album} className="w-16 h-16 rounded-md mr-4" />
+                <div 
+                  key={song.songId} 
+                  className="p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow flex items-center cursor-pointer" 
+                  onClick={() => handleSongClick(song.songId)}
+                >
+                  <img src={song.album_img !== '-' ? song.album_img : 'default_album_img.png'} alt={song.album} className="w-16 h-16 rounded-md mr-4" />
                   <div className="flex-1">
                     <div className="text-lg font-bold">{song.title}</div>
                     <div className="text-sm text-gray-600 mt-1">{song.artist}</div>
@@ -110,7 +189,7 @@ export default function SearchPage() {
               ))}
             </div>
           ) : (
-            <p className="text-gray-500">검색 결과가 없습니다.</p>
+            <p className="text-gray-500">검색어를 입력해주세요.</p>
           )}
         </div>
       </div>

@@ -9,6 +9,7 @@ import DashboardPage from './pages/DashboardPage';
 import MySetlistsPage from './pages/MySetlistsPage';
 import SettingsPage from './pages/SettingsPage';
 import SearchPage from './pages/SearchPage';
+import SongDetailPage from './pages/SongDetailPage';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/my-setlists" element={<MySetlistsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/search" element={<SearchPage />} />
+        <Route path="/songs/:songId" element={<SongDetailPage />} />
         <Route
           path="*"
           element={

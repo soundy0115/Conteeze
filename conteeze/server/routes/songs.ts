@@ -45,4 +45,31 @@ const searchHandler: RequestHandler = async (req, res, next): Promise<void> => {
 
 router.get('/search', searchHandler);
 
+// 곡 상세 정보를 가져오는 새로운 핸들러
+const getSongDetailsHandler: RequestHandler = async (req, res, next): Promise<void> => {
+  try {
+    console.log('으아아아아ㅏㅇ');  // 쿼리 로깅 추가
+
+    const { songId } = req.params;
+    
+    console.log(`상세 정보 요청된 곡 ID: ${songId}`);
+
+    const song = await ISong.findOne({ songId: songId });
+    
+    if (!song) {
+      res.status(404).json({ message: '곡을 찾을 수 없습니다.' });
+      return;
+    }
+
+    console.log('곡 상세 정보 찾음:', song);
+    res.json(song);
+  } catch (error) {
+    console.error('곡 상세 정보 조회 오류:', error);
+    next(error);
+  }
+};
+
+// 새로운 라우트 추가
+router.get('/:songId', getSongDetailsHandler);
+
 export default router;
